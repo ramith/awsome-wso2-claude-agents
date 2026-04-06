@@ -26,7 +26,7 @@ If a build is running, provide **periodic status updates** since it takes signif
 | `GRAALVM_HOME` or `JAVA_HOME` set | Yes | No |
 | Docker (8GB+ memory recommended) | No | Yes |
 
-Install GraalVM locally via SDKMAN!: `sdk install java 21.0.2-graalce`
+Install GraalVM locally via SDKMAN!: `sdk install java 21.0.2-graalce` (latest JDK 21 CE is 21.0.2, not 21.0.6 — verify at graalvm/graalvm-ce-builds releases)
 
 ## Workflow A: Build Locally
 
@@ -42,6 +42,16 @@ Install GraalVM locally via SDKMAN!: `sdk install java 21.0.2-graalce`
 2. Run `bal build --graalvm --cloud=docker` to **generate the Dockerfile** (multi-stage: GraalVM build -> distroless runtime).
 3. If the user needs docker-compose or other infrastructure, **create those files first** — the GraalVM build happens naturally when `docker compose build` runs.
 4. Run: `docker run -d -p <port>:<port> <project-name>:latest`
+
+### Docker gotchas (known issues)
+
+- **`ghcr.io/ballerina-platform/ballerina` returns 403** — use `ballerina/ballerina` from Docker Hub, or use the GraalVM base with Ballerina zip.
+- **`ballerina/ballerina` is Alpine (musl)** — GraalVM CE binaries are glibc-based. Installing GraalVM into this image causes `Unable to load jimage library` errors. Do NOT mix them.
+- **Recommended Dockerfile strategy**: Use `ghcr.io/graalvm/native-image-community:21` (Oracle Linux, glibc) as build stage, install Ballerina via the platform-independent zip from GitHub releases.
+- **Ballerina download URLs**: `dist.ballerina.io` returns 403. Use GitHub releases instead: `https://github.com/ballerina-platform/ballerina-distribution/releases/download/v{version}/ballerina-{version}-swan-lake.zip`
+- **No aarch64 .rpm/.deb for Ballerina** — the platform-independent `.zip` works on all architectures (JVM-based).
+- **`ballerina/ballerina` runs as non-root** — use `USER root` before installing to `/opt` or system dirs.
+- **`docker-compose.yml` `version` key is obsolete** — modern Docker Compose ignores it. Omit it.
 
 ## GraalVM Build Options
 
