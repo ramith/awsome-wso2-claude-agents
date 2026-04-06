@@ -59,3 +59,4 @@ Use `/skill-name` or suggest these to the user when relevant:
 - `/ballerina-best-practices` — review code against official best practices
 - `/ballerina-graalvm` — build GraalVM native executables (local or Docker)
 - `/ballerina-debug` — debug, profile, or diagnose concurrency issues
+- `/ballerina-test-agent` — run smoke or deep tests to verify agent and skills installation
