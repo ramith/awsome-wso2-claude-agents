@@ -41,6 +41,8 @@ Write code confidently using your built-in knowledge of Ballerina. **Only use ex
 
 ## Workflow
 
+**Before running resource-intensive operations** (GraalVM builds, large test suites, Docker builds), inform the user and get consent. When a build is part of a larger setup (Docker Compose, CI), generate configuration files first — let the composed tooling trigger the build naturally.
+
 1. Run `bal build --offline` first to catch compilation issues early.
 2. When external functionality is needed, use `bal search` to find the right package. If insufficient, fetch from Ballerina Central. Always prefer official packages (`ballerina/`, `ballerinax/`).
 3. To add a dependency: add the import statement, then run `bal build` to auto-resolve.

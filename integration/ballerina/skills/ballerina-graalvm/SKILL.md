@@ -6,6 +6,17 @@ allowed-tools: Read Write Edit Bash Glob Grep
 
 Help the user build a GraalVM native executable from their Ballerina project. Ask which approach they prefer if not specified: **local** or **container (Docker)**.
 
+## IMPORTANT: Ask before building
+
+GraalVM native image builds are **resource-intensive** (high memory + CPU) and **time-consuming** (minutes to tens of minutes). **Always inform the user and get explicit consent before running `bal build --graalvm`.**
+
+When the build is part of a larger setup (e.g., Docker Compose, CI pipeline):
+- **Generate the configuration files first** (Dockerfile, docker-compose.yml, CI config) without running the build.
+- Let the user trigger the build themselves or through the composed tooling (e.g., `docker compose build` will run the GraalVM build inside the container naturally).
+- Do not eagerly run `bal build --graalvm` when the user's intent is to set up infrastructure — configure first, build later.
+
+If a build is running, provide **periodic status updates** since it takes significant time.
+
 ## Prerequisites
 
 | Requirement | Local | Container |
@@ -20,15 +31,16 @@ Install GraalVM locally via SDKMAN!: `sdk install java 21.0.2-graalce`
 ## Workflow A: Build Locally
 
 1. Verify GraalVM is installed: `java -version` (should show GraalVM).
-2. Build: `bal build --graalvm`
-3. Run: `./target/bin/<project-name>`
-4. If build warns about incompatible packages, run tests against native image: `bal test --graalvm`
+2. **Ask the user for consent** — inform them the build will be resource-intensive.
+3. Build: `bal build --graalvm`
+4. Run: `./target/bin/<project-name>`
+5. If build warns about incompatible packages, run tests against native image: `bal test --graalvm`
 
 ## Workflow B: Build in Docker Container
 
 1. Verify Docker is running and has 8GB+ memory allocated.
-2. Build: `bal build --graalvm --cloud=docker`
-3. This auto-generates a multi-stage Dockerfile (GraalVM build stage -> distroless runtime).
+2. Run `bal build --graalvm --cloud=docker` to **generate the Dockerfile** (multi-stage: GraalVM build -> distroless runtime).
+3. If the user needs docker-compose or other infrastructure, **create those files first** — the GraalVM build happens naturally when `docker compose build` runs.
 4. Run: `docker run -d -p <port>:<port> <project-name>:latest`
 
 ## GraalVM Build Options
