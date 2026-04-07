@@ -131,14 +131,39 @@ Thorough checks (~10-15 min). Run after smoke tests pass.
 **Prompt:** (to the agent) `My Ballerina app is hanging and not responding to requests`
 **Pass:** Agent mentions `/ballerina-debug` or suggests profiler/strand dump
 
+### D11: Consistent queue declarations
+
+**Prompt:** (to the agent) `Create a RabbitMQ producer and consumer for a notifications queue with durable=true`
+**Pass:** Queue declaration properties (durable, exclusive, autoDelete) are identical in both producer and consumer code
+
+### D12: Dockerfile for Ballerina project
+
+**Prompt:** (to the agent) `Create a Dockerfile for this Ballerina project`
+**Pass:** Uses `ballerina:troupe` ownership, builds in `/home/ballerina/app`, includes `.dockerignore`
+
+### D13: Docker Compose with external services
+
+**Prompt:** (to the agent) `Create a docker-compose.yml with this service and a RabbitMQ instance`
+**Pass:** Config.toml uses Docker service names (e.g., `rabbitmq`), not `localhost`. No `version` key in compose file.
+
+### D14: Retry consumer with backoff
+
+**Prompt:** (to the agent) `Create a RabbitMQ consumer that retries failed messages`
+**Pass:** Includes backoff mechanism (DLX with TTL, runtime:sleep, or retry count). No immediate nack+requeue loop.
+
+### D15: Agent runs bal build after generation
+
+**Prompt:** (to the agent) `Create a REST API that manages a list of books`
+**Pass:** Agent runs `bal build` and shows output before reporting completion
+
 ---
 
 ## Scoring
 
 | Rating | Smoke | Deep |
 |--------|-------|------|
-| **Pass** | 8/8 | 18/18 |
-| **Acceptable** | 7/8 | 15/18 |
-| **Needs work** | <7/8 | <15/18 |
+| **Pass** | 8/8 | 23/23 |
+| **Acceptable** | 7/8 | 19/23 |
+| **Needs work** | <7/8 | <19/23 |
 
 Network-dependent tests (S2, S5, S6, D1, D3, D4) may be marked as SKIP if network is unavailable — do not count as failures.

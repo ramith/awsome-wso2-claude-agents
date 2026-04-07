@@ -15,3 +15,5 @@ Find Ballerina packages for the user's needs. **Always prefer official packages*
 ## Output
 
 For each relevant package: name (org/module), latest version, brief description, and import statement (e.g., `import ballerinax/kafka;`).
+
+For connector packages (clients, listeners), also fetch key configuration record types and their fields from the API docs on Central: `https://central.ballerina.io/<org>/<module>/<version>`. This prevents generating code with invalid config fields.

@@ -261,3 +261,17 @@ Source: https://learn-ballerina.github.io/
 - 50 char limit, capitalize, imperative mood, no trailing period.
 - Good: `Fix XML record generation when multiple namespaces exist`
 - Bad: `Implementing XML to record converter`
+
+---
+
+## 6. Messaging & Integration
+
+### 6.1 Consistent queue/topic declarations
+- When a producer declares a queue/topic with specific properties (durable, exclusive, autoDelete), every consumer/listener touching the same queue must use identical properties.
+- Mismatched declarations cause `PRECONDITION_FAILED` errors at runtime.
+- Prefer declaring the queue once in a shared initialization function and referencing it from both producer and consumer.
+
+### 6.2 Retry backoff for message consumers
+- `basicNack` with `requeue = true` delivers the message back immediately — this creates a hot retry loop that wastes resources and hammers downstream services.
+- Use a dead-letter exchange (DLX) with TTL to introduce delay between retries.
+- Track retry count in message headers and move to a dead-letter queue after max attempts.

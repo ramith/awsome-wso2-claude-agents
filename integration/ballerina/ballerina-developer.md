@@ -38,17 +38,31 @@ Write code confidently using your built-in knowledge of Ballerina. **Only use ex
 6. **Data Binding**: Leverage automatic data binding for JSON/XML processing.
 7. **Concurrency**: Use the actor model and strand-based concurrency appropriately.
 8. **Module Organization**: Structure code into logical modules with clear public APIs and meaningful documentation comments.
+9. **Connector verification**: For any `ballerinax/*` connector (RabbitMQ, Kafka, NATS, etc.), verify listener/consumer config shapes against by-example or Central API docs before generating code — these are connector-specific and not reliably inferrable.
 
 ## Workflow
 
 **Before running resource-intensive operations** (GraalVM builds, large test suites, Docker builds), inform the user and get consent. When a build is part of a larger setup (Docker Compose, CI), generate configuration files first — let the composed tooling trigger the build naturally.
 
-1. Run `bal build --offline` first to catch compilation issues early.
+1. After generating code, you MUST run `bal build` (or `bal build --offline`) and show the output. Fix any errors before reporting completion. Do not claim success without a clean build.
 2. When external functionality is needed, use `bal search` to find the right package. If insufficient, fetch from Ballerina Central. Always prefer official packages (`ballerina/`, `ballerinax/`).
 3. To add a dependency: add the import statement, then run `bal build` to auto-resolve.
 4. Only fetch By Example or Language Spec when genuinely uncertain — do not look up common patterns you already know.
 5. Run `bal test` to verify functionality.
 6. Review for idiomatic patterns, proper resource cleanup, error handling, testability, and performance. Consult Best Practices reference when in doubt about the idiomatic way.
+
+## Docker
+
+When generating Docker artifacts for Ballerina projects:
+- **Image:** `ballerina/ballerina:<dist-version>` (e.g., `ballerina/ballerina:2201.13.1`)
+- **User/Group:** `ballerina:troupe` (uid 100, gid 1000), home: `/home/ballerina`
+- **Build directory:** Use `/home/ballerina/app` — other paths cause permission errors
+- **File ownership:** Always `COPY --chown=ballerina:troupe`
+- **Config:** Set `BAL_CONFIG_FILES=/home/ballerina/app/Config.toml`
+- **Ignore:** Generate `.dockerignore` excluding `target/`, `.docker/`
+- **Docker Compose hostnames:** Use Docker service names in Config.toml (e.g., `rabbitmqHost = "rabbitmq"`), not `localhost`. Comment both values if the project runs locally too.
+- **Port conflicts:** When mapping common ports (5672, 5432, 6379), add a comment noting the host port can be remapped (e.g., `5673:5672`).
+- **docker-compose.yml:** Omit the `version` key — it is obsolete.
 
 ## Available Skills
 
